@@ -35,8 +35,10 @@ short average_sorting_time(pfunc_sort method,
     int min_ob = -1, max_ob = -1;
     clock_t start, end;
 
-    if (!method || !ptime || n_perms <= 0 || N <= 0)
-        return ERR;
+    assert(method == NULL);
+    assert(ptime == NULL);
+    assert(n_perms <= 0);
+    assert(N <= 0);
 
     perms = generate_permutations(n_perms, N);
     if (!perms)
@@ -145,3 +147,4 @@ short save_time_table(char* file, PTIME_AA times, int n_times)
     fclose(fout);
     return OK;
 }
+
