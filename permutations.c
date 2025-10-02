@@ -28,7 +28,7 @@
 int random_num(int inf, int sup)
 {
   if(inf > sup){
-    return ERR;
+    return ERR
   }
   return rand()/(RAND_MAX+1.)*(sup-inf+1)+inf;
 }
@@ -106,4 +106,29 @@ int** generate_permutations(int n_perms, int N)
 
   return perm;
 }
+
+/***************************************************/
+/* Function: free_permutations Date:               */
+/* Authors:                                        */
+/*                                                 */
+/* Function that frees the permutations            */
+/*                                                 */
+/* Input:                                          */
+/* int n_perms: Number of permutations             */
+/* int N: Number of elements in each permutation   */
+/* Output:                                         */                
+/***************************************************/
+void free_permutations(int **perm, int n_perms, int N)
+{
+  int i, j;
+    
+  for (i = 0; i < n_perms; i++){
+    for (j = 0; j < N; j++){
+      free(perm[i][j]);
+    }
+  }
+
+  return perm;
+}
+
 
