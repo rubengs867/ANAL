@@ -35,10 +35,10 @@ short average_sorting_time(pfunc_sort method,
     int min_ob = -1, max_ob = -1;
     clock_t start, end;
 
-    assert(method == NULL);
-    assert(ptime == NULL);
-    assert(n_perms <= 0);
-    assert(N <= 0);
+    assert(method != NULL);
+    assert(ptime != NULL);
+    assert(n_perms > 0);
+    assert(N > 0);
 
     perms = generate_permutations(n_perms, N);
     if (!perms)
