@@ -54,7 +54,7 @@ int* generate_perm(int N)
   int dum;
   perm = malloc(N*sizeof(int));
   if(perm==NULL){
-    return ERR;
+    return NULL;
   }
   for(j=0; j<N; j++){
     perm[j] = j+1;
@@ -130,5 +130,6 @@ void free_permutations(int **perm, int n_perms, int N)
 
   return perm;
 }
+
 
 
