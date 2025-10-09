@@ -86,9 +86,13 @@ int* generate_perm(int N)
 /***************************************************/
 int** generate_permutations(int n_perms, int N)
 {
-  int **perm;
+  int **perm = NULL;
   int i;
 
+  if (n_perms < 1 || N < 1){
+    return NULL;
+  }
+  
   perm = malloc(n_perms*sizeof(int*));
   if (perm == NULL){
     return NULL;
@@ -130,6 +134,7 @@ void free_permutations(int **perm, int n_perms, int N)
 
   return perm;
 }
+
 
 
 
