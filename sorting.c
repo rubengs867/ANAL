@@ -3,14 +3,27 @@
  * Descripcion: Implementation of sorting functions
  *
  * Fichero: sorting.c
- * Autor: Carlos Aguirre
+ * Autor: Marco Manceñido, Rubén García
  * Version: 1.0
  * Fecha: 16-09-2019
  *
  */
 
-
 #include "sorting.h"
+
+/***************************************************/
+/* Function: swap                                   */
+/* Date:                                           */
+/* Authors: Marco Manceñido, Rubén García          */
+/*                                                 */
+/* Intercambia los valores de dos enteros          */
+/*                                                 */
+/* Input:                                          */
+/* int *a: puntero al primer entero                */
+/* int *b: puntero al segundo entero               */
+/* Output:                                         */
+/* void                                            */
+/***************************************************/
 void swap(int *a, int *b)
 {
     int temp;
@@ -25,8 +38,22 @@ void swap(int *a, int *b)
 }
 
 /***************************************************/
-/* Function: InsertSort    Date:                   */
-/* Your comment                                    */
+/* Function: InsertSort                            */
+/* Date:                                           */
+/* Authors: Marco Manceñido, Rubén García          */
+/*                                                 */
+/* Implementa el algoritmo de ordenación por       */
+/* inserción (Insertion Sort). Devuelve el número  */
+/* de veces que se ejecuta la Operación Básica (OB)*/
+/* o ERR en caso de error.                         */
+/*                                                 */
+/* Input:                                          */
+/* int *array: puntero al array a ordenar          */
+/* int ip: índice inicial del array                */
+/* int iu: índice final del array                  */
+/* Output:                                         */
+/* int: número de veces que se ejecuta la OB       */
+/*       o ERR si hay error                        */
 /***************************************************/
 int InsertSort(int *array, int ip, int iu)
 {
@@ -59,12 +86,23 @@ int InsertSort(int *array, int ip, int iu)
     return counter;
 }
 
-
-
-
 /***************************************************/
-/* Function: SelectSort    Date:                   */
-/* Your comment                                    */
+/* Function: BubbleSort                            */
+/* Date:                                           */
+/* Authors: Marco Manceñido, Rubén García          */
+/*                                                 */
+/* Implementa el algoritmo de ordenación por       */
+/* burbuja (Bubble Sort). Devuelve el número de    */
+/* veces que se ejecuta la Operación Básica (OB)   */
+/* o ERR en caso de error.                         */
+/*                                                 */
+/* Input:                                          */
+/* int *array: puntero al array a ordenar          */
+/* int ip: índice inicial del array                */
+/* int iu: índice final del array                  */
+/* Output:                                         */
+/* int: número de veces que se ejecuta la OB       */
+/*       o ERR si hay error                        */
 /***************************************************/
 int BubbleSort(int *array, int ip, int iu)
 {
@@ -88,6 +126,7 @@ int BubbleSort(int *array, int ip, int iu)
 
     return counter;
 }
+
 
 
 
