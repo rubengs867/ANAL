@@ -36,7 +36,6 @@ short average_sorting_time(pfunc_sort metodo, int n_perms, int N, PTIME_AA ptime
   }
 
   permutations = generate_permutations(n_perms, N);
-
   if (permutations == NULL)
   {
     return ERR;
@@ -80,7 +79,7 @@ short average_sorting_time(pfunc_sort metodo, int n_perms, int N, PTIME_AA ptime
   ptime->N = N;
   ptime->n_elems = n_perms;
 
-  free(permutations);
+  free_permutations(permutations, n_perms);
 
   return OK;
 }
@@ -155,3 +154,5 @@ short save_time_table(char* file, PTIME_AA times, int n_times)
     fclose(fout);
     return OK;
 }
+
+
