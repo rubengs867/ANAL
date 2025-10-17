@@ -9,38 +9,41 @@ EXE = exercise1 exercise2 exercise3 exercise4 exercise5
 
 all : $(EXE)
 
-.PHONY : clean
+.PHONY : clean valgrind_all
 clean :
-	rm -f *.o core $(EXE)
+	rm -f *.o core $(EXE) *.log
 
 $(EXE) : % : %.o sorting.o times.o permutations.o
 	@echo "#---------------------------"
 	@echo "# Generating $@ "
-	@echo "# Depepends on $^"
+	@echo "# Depends on $^"
 	@echo "# Has changed $<"
 	$(CC) $(CFLAGS) -o $@ $@.o sorting.o times.o permutations.o
 
 permutations.o : permutations.c permutations.h
 	@echo "#---------------------------"
 	@echo "# Generating $@ "
-	@echo "# Depepends on $^"
+	@echo "# Depends on $^"
 	@echo "# Has changed $<"
 	$(CC) $(CFLAGS) -c $<
 
 sorting.o : sorting.c sorting.h
 	@echo "#---------------------------"
 	@echo "# Generating $@ "
-	@echo "# Depepends on $^"
+	@echo "# Depends on $^"
 	@echo "# Has changed $<"
 	$(CC) $(CFLAGS) -c $<
 
- times.o : times.c times.h
+times.o : times.c times.h
 	@echo "#---------------------------"
 	@echo "# Generating $@ "
-	@echo "# Depepends on $^"
+	@echo "# Depends on $^"
 	@echo "# Has changed $<"
 	$(CC) $(CFLAGS) -c $<
-	
+
+# -------------------
+# TEST RULES
+# -------------------
 exercise1_test:
 	@echo Running exercise1
 	@./exercise1 -limInf 1 -limSup 10 -numN 1000
@@ -60,4 +63,35 @@ exercise4_test:
 exercise5_test:
 	@echo Running exercise5
 	@./exercise5 -num_min 1 -num_max 5 -incr 1 -numP 5 -outputFile exercise5.log
+
+# -------------------
+# VALGRIND RULES
+# -------------------
+exercise1_valgrind:
+	@echo "### Valgrind exercise1 ###"
+	valgrind --leak-check=full --show-leak-kinds=all ./exercise1 -limInf 1 -limSup 10 -numN 1000
+
+exercise2_valgrind:
+	@echo "### Valgrind exercise2 ###"
+	valgrind --leak-check=full --show-leak-kinds=all ./exercise2 -size 1 -numP 5
+
+exercise3_valgrind:
+	@echo "### Valgrind exercise3 ###"
+	valgrind --leak-check=full --show-leak-kinds=all ./exercise3 -size 1 -numP 5
+
+exercise4_valgrind:
+	@echo "### Valgrind exercise4 ###"
+	valgrind --leak-check=full --show-leak-kinds=all ./exercise4 -size 10
+
+exercise5_valgrind:
+	@echo "### Valgrind exercise5 ###"
+	valgrind --leak-check=full --show-leak-kinds=all ./exercise5 -num_min 1 -num_max 5 -incr 1 -numP 5 -outputFile exercise5.log
+
+# -------------------
+# GENERAL RULE
+# -------------------
+valgrind_all: exercise1_valgrind exercise2_valgrind exercise3_valgrind exercise4_valgrind exercise5_valgrind
+	@echo "### All Valgrind tests completed successfully ###"
+
+
 
