@@ -3,7 +3,7 @@
  * Descripcion: Implementation of time measurement functions
  *
  * Fichero: times.c
- * Autor: Marco Manceñido, Rubén García
+ * Autor: Carlos Aguirre Maeso (adaptado con implementación)
  * Version: 1.1
  * Fecha: 02-10-2025
  *
@@ -12,107 +12,86 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <assert.h>
 #include "times.h"
 #include "sorting.h"
 #include "permutations.h"   /* Necesaria para generate_permutations() */
+#include <assert.h>
 
 /***************************************************/
-/* Function: average_sorting_time                  */
-/* Date:                                           */
-/* Authors: Marco Manceñido, Rubén García          */
+/* Function: average_sorting_time Date:            */
 /*                                                 */
-/* Calcula el tiempo medio y estadísticas de OB    */
-/* sobre n_perms permutaciones de tamaño N.        */
-/* Ejecuta el método de ordenación recibido por    */
-/* parámetro sobre copias de las permutaciones.    */
-/*                                                 */
-/* Input:                                          */
-/* pfunc_sort method: puntero a la función de      */
-/*   ordenación                                    */
-/* int n_perms: número de permutaciones a generar  */
-/* int N: tamaño de cada permutación               */
-/* PTIME_AA ptime: puntero a la estructura donde   */
-/*   se guardan los resultados                     */
-/* Output:                                         */
-/* short: OK si correcto, ERR si hay error         */
+/* Your documentation                              */
 /***************************************************/
-short average_sorting_time(pfunc_sort method, 
-                           int n_perms,
-                           int N, 
-                           PTIME_AA ptime)
+short average_sorting_time(pfunc_sort metodo, int n_perms, int N, PTIME_AA ptime)
 {
-    int i, j;
-    int **perms = NULL;      
-    int ob;                  
-    double total_time = 0;   
-    double total_ob = 0;     
-    int min_ob = -1, max_ob = -1;
-    clock_t start, end;
+  clock_t time0, time1;
+  int **permutations = NULL;
+  int i, ob, allob = 0;
+  int min_ob;
+  int max_ob;
 
-    assert(method != NULL);
-    assert(ptime != NULL);
-    assert(n_perms > 0);
-    assert(N > 0);
+  if (metodo == NULL || ptime == NULL || n_perms < 1 || N < 1)
+  {
+    return ERR;
+  }
 
-    perms = generate_permutations(n_perms, N);
-    if (!perms)
-        return ERR;
+  permutations = generate_permutations(n_perms, N);
 
-    for (i = 0; i < n_perms; i++) {
-        int *perm_copy = (int*) malloc(N * sizeof(int));
-        if (!perm_copy) {
-            free_permutations(perms, n_perms);
-            return ERR;
-        }
+  if (permutations == NULL)
+  {
+    return ERR;
+  }
 
-        /* Copiar la permutación porque el algoritmo modifica el array */
-        for (j = 0; j < N; j++) perm_copy[j] = perms[i][j];
+  time0 = clock();
 
-        start = clock();
-        ob = method(perm_copy, 0, N-1);
-        end = clock();
-
-        total_time += (double)(end - start) / CLOCKS_PER_SEC;
-        total_ob += ob;
-
-        if (min_ob == -1 || ob < min_ob) min_ob = ob;
-        if (max_ob == -1 || ob > max_ob) max_ob = ob;
-
-        free(perm_copy);
+  for (i = 0; i < n_perms; i++)
+  {
+    ob = metodo(*(permutations + i), 0, N - 1);
+    if (i == 0) {  
+    min_ob = max_ob = ob;
     }
+    if (ob == ERR)
+    {
+      free(permutations);
+      return ERR;
+    }
+    else
+    {
+      allob += ob;
 
-    /* Guardar resultados en la estructura */
-    ptime->N = N;
-    ptime->n_elems = n_perms;
-    ptime->time = total_time / n_perms;
-    ptime->average_ob = total_ob / n_perms;
-    ptime->min_ob = min_ob;
-    ptime->max_ob = max_ob;
+      if (ob < min_ob)
+      {
+        min_ob = ob;
+      }
 
-    free_permutations(perms, n_perms);
-    return OK;
+      if (ob > max_ob)
+      {
+        max_ob = ob;
+      }
+    }
+  }
+
+  time1 = clock();
+
+  ptime->time = (double)(time1 - time0) / (double)CLOCKS_PER_SEC / (double)n_perms;
+  ptime->average_ob = (double)allob / (double)n_perms;
+  ptime->min_ob = min_ob;
+  ptime->max_ob = max_ob;
+  ptime->N = N;
+  ptime->n_elems = n_perms;
+
+  free(permutations);
+
+  return OK;
 }
+
+
 
 /***************************************************/
 /* Function: generate_sorting_times                */
-/* Date:                                           */
-/* Authors: Marco Manceñido, Rubén García          */
 /*                                                 */
-/* Ejecuta average_sorting_time para distintos     */
-/* tamaños de N y guarda los resultados obtenidos  */
-/* en un fichero.                                 */
-/*                                                 */
-/* Input:                                          */
-/* pfunc_sort method: puntero al algoritmo de      */
-/*   ordenación                                    */
-/* char* file: nombre del fichero de salida        */
-/* int num_min: tamaño mínimo de las permutaciones */
-/* int num_max: tamaño máximo de las permutaciones */
-/* int incr: incremento entre tamaños sucesivos    */
-/* int n_perms: número de permutaciones por tamaño */
-/* Output:                                         */
-/* short: OK si correcto, ERR si hay error         */
+/* Ejecuta average_sorting_time para varios N      */
+/* y guarda los resultados en un fichero           */
 /***************************************************/
 short generate_sorting_times(pfunc_sort method, char* file, 
                              int num_min, int num_max, 
@@ -148,21 +127,10 @@ short generate_sorting_times(pfunc_sort method, char* file,
 
 /***************************************************/
 /* Function: save_time_table                       */
-/* Date:                                           */
-/* Authors: Marco Manceñido, Rubén García          */
 /*                                                 */
-/* Guarda los resultados de tiempos y estadísticas */
-/* en un fichero de texto con formato tabulado.    */
-/*                                                 */
-/* Formato:                                        */
+/* Guarda los resultados en un fichero de texto    */
+/* con el formato:                                 */
 /* N   time   avg_OB   min_OB   max_OB             */
-/*                                                 */
-/* Input:                                          */
-/* char* file: nombre del fichero de salida        */
-/* PTIME_AA times: array con resultados            */
-/* int n_times: número de tamaños analizados       */
-/* Output:                                         */
-/* short: OK si correcto, ERR si hay error         */
 /***************************************************/
 short save_time_table(char* file, PTIME_AA times, int n_times)
 {
@@ -187,5 +155,3 @@ short save_time_table(char* file, PTIME_AA times, int n_times)
     fclose(fout);
     return OK;
 }
-
-
