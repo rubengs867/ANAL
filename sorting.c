@@ -12,15 +12,21 @@
 
 #include "sorting.h"
 #include <stdlib.h>
-void swap(int *a, int *b)
-{
-    int temp;
 
-    if (!a || !b) {
-        return; 
-    }
 
-    temp = *a;
+/***************************************************/
+/* Function: swap Date:               */
+/* Authors: Marco Manceñido       */
+/*                                                 */
+/* Function that swaps two elements       */
+/*                                                 */
+/* Input:                                          */
+/* int *a: first element   */
+/* int *b: second element            */
+/* Output: void                                   */
+/***************************************************/
+void swap(int *a, int *b) {
+    int temp = *a;
     *a = *b;
     *b = temp;
 }
@@ -34,10 +40,8 @@ int InsertSort(int *array, int ip, int iu)
     int size, i, j, key;
     int counter = 0; 
 
-    if (!array || ip < 0 || iu < ip) {
-        return ERR;
-    }
-
+    assert(array != NULL && ip >= 0 && iu >= ip); //Preguntar por asserts
+    
     size = iu - ip + 1;
 
     for (i = 1; i < size; ++i) {

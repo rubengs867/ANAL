@@ -12,6 +12,8 @@
 #ifndef PERMUTATIONS_H
 #define PERMUTATIONS_H
 
+#include "sorting.h"
+
 /* constants */
 
 #ifndef ERR

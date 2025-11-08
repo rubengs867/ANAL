@@ -23,7 +23,7 @@
 typedef int (* pfunc_sort)(int*, int, int);
 
 /* Functions */
-
+void swap(int *a, int *b);
 int BubbleSort(int* array, int ip, int iu);
 int InsertSort(int* array, int ip, int iu);
 int merge(int* tabla, int ip, int iu, int imedio);

@@ -27,9 +27,8 @@
 /***************************************************/
 int random_num(int inf, int sup)
 {
-    if(inf > sup){
-        return ERR;
-    }
+    assert(sup<inf); //Hay que mirar aqui si quitarlo o no
+
     return rand() / (RAND_MAX + 1.) * (sup - inf + 1) + inf;
 }
 
@@ -49,7 +48,7 @@ int random_num(int inf, int sup)
 int* generate_perm(int N)
 {
     int *perm;
-    int j, num, dum;
+    int j, num;
 
     perm = malloc(N * sizeof(int));
     if(perm == NULL){
@@ -62,9 +61,7 @@ int* generate_perm(int N)
 
     for(j = 0; j < N; j++){
         num = random_num(j, N - 1);
-        dum = perm[j];
-        perm[j] = perm[num];
-        perm[num] = dum;
+        swap (perm[j], perm[num]);
     }
 
     return perm;
@@ -87,12 +84,10 @@ int* generate_perm(int N)
 /***************************************************/
 int** generate_permutations(int n_perms, int N)
 {
-    int **perm = NULL;
+    int **perm;
     int i;
 
-    if(n_perms < 1 || N < 1){
-        return NULL;
-    }
+    assert(n_perms>=1 && N >= 1); //Preguntar si hay que hacer los asserts
 
     perm = malloc(n_perms * sizeof(int*));
     if(perm == NULL){
@@ -138,6 +133,7 @@ void free_permutations(int **perm, int n_perms)
 
     free(perm);
 }
+
 
 
 
