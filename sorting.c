@@ -96,27 +96,34 @@ int BubbleSort(int *array, int ip, int iu)
 
 
 
+#include <stdio.h>
+#include <stdlib.h>
+
+#define OK 0
+#define ERR -1
+
+int merge(int* tabla, int ip, int iu, int imedio);
+int mergesort(int* tabla, int ip, int iu);
+
 int mergesort(int* tabla, int ip, int iu) {
     int medio;
+    int count = 0;
+    int aux1;
+    int aux2;
 
     if (ip > iu)
         return ERR;
 
     if (ip == iu)
-        return OK;
+        return 0; /* no operaciones */
 
     medio = (ip + iu) / 2;
 
-    if (mergesort(tabla, ip, medio) == ERR)
-        return ERR;
+    aux1 = mergesort(tabla, ip, medio);
 
-    if (mergesort(tabla, medio + 1, iu) == ERR)
-        return ERR;
+    aux2 = mergesort(tabla, medio + 1, iu);
 
-    if (merge(tabla, ip, iu, medio) == ERR)
-        return ERR;
-
-    return OK;
+    return aux1 + aux2 + merge(tabla, ip, iu, medio);
 }
 
 int merge(int* tabla, int ip, int iu, int imedio) {
@@ -125,74 +132,103 @@ int merge(int* tabla, int ip, int iu, int imedio) {
     int j = imedio + 1;
     int k = 0;
     int n = iu - ip + 1;
+    int count = 0; /* operaciones básicas */
 
     Taux = (int*)malloc(n * sizeof(int));
     if (Taux == NULL)
         return ERR;
 
+    /* Comparaciones y asignaciones principales */
     while (i <= imedio && j <= iu) {
         if (tabla[i] <= tabla[j])
-            Taux[k++] = tabla[i++];
+            Taux[k++] = tabla[i++]; /* asignación */
         else
-            Taux[k++] = tabla[j++];
+            Taux[k++] = tabla[j++]; /* asignación */
+        count++; /* por la asignación del elemento */
     }
 
-    while (i <= imedio)
+    while (i <= imedio) {
         Taux[k++] = tabla[i++];
+        count++; /* asignación */
+    }
 
-    while (j <= iu)
+    while (j <= iu) {
         Taux[k++] = tabla[j++];
+        count++; /* asignación */
+    }
 
-    for (k = 0; k < n; k++)
+    /* Copiar de vuelta a tabla */
+    for (k = 0; k < n; k++) {
         tabla[ip + k] = Taux[k];
+    }
 
     free(Taux);
-    return OK;
+    return count;
 }
+
+
 
 
 int quicksort(int* tabla, int ip, int iu) {
     int M;
+    int count = 0;
+    int aux;
 
     if (ip > iu)
         return ERR;
 
     if (ip == iu)
-        return OK;
+        return 0; /* sin operaciones básicas */
 
-    if (partition(tabla, ip, iu, &M) == ERR)
+    aux = partition(tabla, ip, iu, &M);
+    if (aux == ERR)
         return ERR;
+    count += aux; /* operaciones en partition */
 
-    if (ip < M - 1)
-        quicksort(tabla, ip, M - 1);
+    if (ip < M - 1) {
+        aux = quicksort(tabla, ip, M - 1);
+        if (aux == ERR)
+            return ERR;
+        count += aux;
+    }
 
-    if (M + 1 < iu)
-        quicksort(tabla, M + 1, iu);
+    if (M + 1 < iu) {
+        aux = quicksort(tabla, M + 1, iu);
+        if (aux == ERR)
+            return ERR;
+        count += aux;
+    }
 
-    return OK;
+    return count;
 }
 
 int partition(int* tabla, int ip, int iu, int *pos) {
     int pivote, i, j, tmp;
     int medio;
+    int count = 0; /* operaciones básicas */
 
-    /* Elegir pivote usando la mediana de tres */
-    if (median(tabla, ip, iu, &medio) == ERR)
+    /* Mediana de tres */
+    if (median_stat(tabla, ip, iu, &medio) == ERR)
         return ERR;
 
+    /* pivote = tabla[medio] */
     pivote = tabla[medio];
+    count++; /* lectura del pivote */
 
     /* Mover pivote al final */
     tmp = tabla[medio];
     tabla[medio] = tabla[iu];
     tabla[iu] = tmp;
+    count += 3; /* tres asignaciones */
 
     i = ip;
     for (j = ip; j < iu; j++) {
+        count++; /* comparación tabla[j] < pivote */
         if (tabla[j] < pivote) {
             tmp = tabla[i];
             tabla[i] = tabla[j];
             tabla[j] = tmp;
+            count += 3; /* tres asignaciones por swap */
             i++;
         }
     }
@@ -201,9 +237,10 @@ int partition(int* tabla, int ip, int iu, int *pos) {
     tmp = tabla[i];
     tabla[i] = tabla[iu];
     tabla[iu] = tmp;
+    count += 3; /* tres asignaciones */
 
     *pos = i;
-    return OK;
+    return count;
 }
 
 int median(int *tabla, int ip, int iu, int *pos) {
@@ -211,17 +248,36 @@ int median(int *tabla, int ip, int iu, int *pos) {
     int a = tabla[ip];
     int b = tabla[medio];
     int c = tabla[iu];
-
-    /* Comparar para obtener la mediana de tres */
-    if ((a <= b && b <= c) || (c <= b && b <= a))
-        *pos = medio;
-    else if ((b <= a && a <= c) || (c <= a && a <= b))
-        *pos = ip;
-    else
-        *pos = iu;
-
-    return OK;
+    int count = 0;
+    *pos = ip;
+    return count;
 }
+
+int median_avg(int *tabla, int ip, int iu, int *pos) {
+    int medio = (ip + iu) / 2;
+    int a = tabla[ip];
+    int b = tabla[medio];
+    int c = tabla[iu];
+    int count = 0;
+
+    /* Comparaciones para obtener la mediana de tres */
+    count++; /* a <= b */
+    count++; /* b <= c */
+    if ((a <= b && b <= c) || (c <= b && b <= a)) {
+        *pos = medio;
+        return count + 4; /* total aprox 4 comparaciones */
+    }
+
+    count += 2; /* b <= a y a <= c */
+    if ((b <= a && a <= c) || (c <= a && a <= b)) {
+        *pos = ip;
+        return count + 4;
+    }
+
+    *pos = iu;
+    return count + 2; /* última comparación */
+}
+
 
 /* median_stat: devuelve en *pos el índice (ip..iu) que contiene
    la mediana entre tabla[ip], tabla[(ip+iu)/2] y tabla[iu].
