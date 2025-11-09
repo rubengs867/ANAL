@@ -1,49 +1,48 @@
 /**
  *
- * Descripcion: Implementation of functions that generate permutations
+ * Descripcion: Implementacion de funciones que generan permutaciones
  *
- * File: permutations.c
- * Autor: Marco Manceñido, Rubén García
+ * Fichero: permutations.c
+ * Autor: Ruben García, Marco Manceñido
  * Version: 1.1
  * Fecha: 21-09-2019
  *
  */
+
 #include <stdlib.h>
 #include <time.h>
+#include <assert.h>
 #include "permutations.h"
 
 /***************************************************/
-/* Function: random_num Date:                      */
-/* Authors: Marco Manceñido, Rubén García         */
+/* Funcion: random_num                              */
+/* Autores: Ruben García, Marco Manceñido         */
 /*                                                 */
-/* Rutine that generates a random number           */
-/* between two given numbers                       */
+/* Funcion que genera un numero aleatorio          */
+/* entre dos valores dados                          */
 /*                                                 */
-/* Input:                                          */
-/* int inf: lower limit                            */
-/* int sup: upper limit                            */
-/* Output:                                         */
-/* int: random number                              */
+/* Entrada:                                        */
+/* int inf: limite inferior                         */
+/* int sup: limite superior                          */
+/* Salida: int: numero aleatorio                   */
 /***************************************************/
 int random_num(int inf, int sup)
 {
-    assert(sup<inf); //Hay que mirar aqui si quitarlo o no
+    assert(sup >= inf); 
 
     return rand() / (RAND_MAX + 1.) * (sup - inf + 1) + inf;
 }
 
 /***************************************************/
-/* Function: generate_perm Date:                   */
-/* Authors: Marco Manceñido, Rubén García         */
+/* Funcion: generate_perm                           */
+/* Autores: Ruben García, Marco Manceñido         */
 /*                                                 */
-/* Rutine that generates a random permutation      */
+/* Funcion que genera una permutacion aleatoria    */
 /*                                                 */
-/* Input:                                          */
-/* int N: number of elements in the permutation   */
-/* Output:                                         */
-/* int *: pointer to integer array                 */
-/* that contains the permutation                   */
-/* or NULL in case of error                        */
+/* Entrada:                                        */
+/* int N: numero de elementos en la permutacion    */
+/* Salida: int*: puntero a array de enteros con    */
+/* la permutacion o NULL en caso de error          */
 /***************************************************/
 int* generate_perm(int N)
 {
@@ -61,33 +60,31 @@ int* generate_perm(int N)
 
     for(j = 0; j < N; j++){
         num = random_num(j, N - 1);
-        swap (perm[j], perm[num]);
+        swap(&perm[j], &perm[num]);
     }
 
     return perm;
 }
 
 /***************************************************/
-/* Function: generate_permutations Date:           */
-/* Authors: Marco Manceñido, Rubén García         */
+/* Funcion: generate_permutations                   */
+/* Autores: Ruben García, Marco Manceñido         */
 /*                                                 */
-/* Function that generates n_perms random          */
-/* permutations with N elements                    */
+/* Funcion que genera n_perms permutaciones        */
+/* aleatorias con N elementos                       */
 /*                                                 */
-/* Input:                                          */
-/* int n_perms: Number of permutations             */
-/* int N: Number of elements in each permutation   */
-/* Output:                                         */
-/* int**: Array of pointers to integer that point  */
-/* to each of the permutations                     */
-/* NULL in case of error                           */
+/* Entrada:                                        */
+/* int n_perms: numero de permutaciones           */
+/* int N: numero de elementos en cada permutacion  */
+/* Salida: int**: array de punteros a enteros que */
+/* apuntan a cada permutacion o NULL en caso error */
 /***************************************************/
 int** generate_permutations(int n_perms, int N)
 {
     int **perm;
     int i;
 
-    assert(n_perms>=1 && N >= 1); //Preguntar si hay que hacer los asserts
+    assert(n_perms >= 1 && N >= 1); 
 
     perm = malloc(n_perms * sizeof(int*));
     if(perm == NULL){
@@ -109,15 +106,16 @@ int** generate_permutations(int n_perms, int N)
 }
 
 /***************************************************/
-/* Function: free_permutations Date:               */
-/* Authors: Marco Manceñido, Rubén García         */
+/* Funcion: free_permutations                       */
+/* Autores: Ruben García, Marco Manceñido         */
 /*                                                 */
-/* Function that frees the permutations            */
+/* Funcion que libera la memoria de las            */
+/* permutaciones generadas                          */
 /*                                                 */
-/* Input:                                          */
-/* int **perm: pointer to array of permutations    */
-/* int n_perms: Number of permutations             */
-/* Output: void                                   */
+/* Entrada:                                        */
+/* int **perm: puntero a array de permutaciones   */
+/* int n_perms: numero de permutaciones           */
+/* Salida: void                                   */
 /***************************************************/
 void free_permutations(int **perm, int n_perms)
 {
@@ -133,9 +131,3 @@ void free_permutations(int **perm, int n_perms)
 
     free(perm);
 }
-
-
-
-
-
-

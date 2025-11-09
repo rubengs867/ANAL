@@ -3,7 +3,7 @@
  * Descripcion: Implementation of time measurement functions
  *
  * Fichero: times.c
- * Autor: Carlos Aguirre Maeso (adaptado con implementación)
+ * Autor: Marco Manceñido, Rubén García
  * Version: 1.1
  * Fecha: 02-10-2025
  *
@@ -12,62 +12,65 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include "times.h"
-#include "sorting.h"
-#include "permutations.h"   /* Necesaria para generate_permutations() */
 #include <assert.h>
+#include "times.h"
 
 /***************************************************/
-/* Function: average_sorting_time Date:            */
+/* Function: average_sorting_time                  */
+/* Authors: Marco Manceñido, Rubén García         */
 /*                                                 */
-/* Your documentation                              */
+/* Function that computes the average sorting time*/
+/* and basic operations for a sorting method      */
+/* applied to multiple permutations                */
+/*                                                 */
+/* Input:                                          */
+/* pfunc_sort method: sorting function pointer    */
+/* int n_perms: number of permutations            */
+/* int N: size of each permutation                 */
+/* PTIME_AA ptime: pointer to store results       */
+/* Output: short: OK or ERR                        */
 /***************************************************/
 short average_sorting_time(pfunc_sort metodo, int n_perms, int N, PTIME_AA ptime)
 {
   clock_t time0, time1;
-  int **permutations = NULL;
+  int **permutations;
   int i, ob, allob = 0;
   int min_ob;
   int max_ob;
 
-  if (metodo == NULL || ptime == NULL || n_perms < 1 || N < 1)
-  {
-    return ERR;
-  }
+  assert(metodo != NULL);
+  assert(ptime != NULL);
+  assert(n_perms >= 1);
+  assert(N >= 1);
 
   permutations = generate_permutations(n_perms, N);
   if (permutations == NULL)
-  {
-    return ERR;
-  }
+      return ERR;
 
   time0 = clock();
 
   for (i = 0; i < n_perms; i++)
   {
-    ob = metodo(*(permutations + i), 0, N - 1);
-    if (i == 0) {  
-    min_ob = max_ob = ob;
-    }
-    if (ob == ERR)
-    {
-      free(permutations);
-      return ERR;
-    }
-    else
-    {
-      allob += ob;
-
-      if (ob < min_ob)
+      ob = metodo(permutations[i], 0, N - 1);
+      if (ob == ERR)
       {
-        min_ob = ob;
+          free_permutations(permutations, n_perms);
+          return ERR;
       }
 
-      if (ob > max_ob)
+      if (i == 0)
       {
-        max_ob = ob;
+          min_ob = max_ob = ob;
+          allob += ob;
       }
-    }
+      else
+      {
+          allob += ob;
+          if (ob < min_ob)
+              min_ob = ob;
+          else if (ob > max_ob)
+              max_ob = ob;
+      }
   }
 
   time1 = clock();
@@ -84,75 +87,100 @@ short average_sorting_time(pfunc_sort metodo, int n_perms, int N, PTIME_AA ptime
   return OK;
 }
 
-
-
 /***************************************************/
 /* Function: generate_sorting_times                */
+/* Authors: Marco Manceñido, Rubén García         */
 /*                                                 */
-/* Ejecuta average_sorting_time para varios N      */
-/* y guarda los resultados en un fichero           */
+/* Function that executes average_sorting_time    */
+/* for several N values and saves the results     */
+/* into a text file                               */
+/*                                                 */
+/* Input:                                          */
+/* pfunc_sort method: sorting function pointer    */
+/* char* file: name of the output file            */
+/* int num_min: minimum N value                    */
+/* int num_max: maximum N value                    */
+/* int incr: increment of N                        */
+/* int n_perms: number of permutations            */
+/* Output: short: OK or ERR                        */
 /***************************************************/
 short generate_sorting_times(pfunc_sort method, char* file, 
                              int num_min, int num_max, 
                              int incr, int n_perms)
 {
-    int i, n_times;
-    PTIME_AA times = NULL;
+  int i, n_times;
+  PTIME_AA times = NULL;
+  int N;
 
-    if (!method || !file || num_min <= 0 || num_max < num_min || incr <= 0 || n_perms <= 0)
-        return ERR;
+  assert(method != NULL);
+  assert(num_min > 0);
+  assert(num_max >= num_min);
+  assert(incr > 0);
+  assert(n_perms > 0);
 
-    n_times = ((num_max - num_min) / incr) + 1;
-    times = (PTIME_AA) malloc(n_times * sizeof(TIME_AA));
-    if (!times)
-        return ERR;
+  n_times = ((num_max - num_min) / incr) + 1;
+  times = (PTIME_AA) malloc(n_times * sizeof(TIME_AA));
+  if (!times)
+      return ERR;
 
-    for (i = 0; i < n_times; i++) {
-        int N = num_min + i*incr;
-        if (average_sorting_time(method, n_perms, N, &times[i]) == ERR) {
-            free(times);
-            return ERR;
-        }
-    }
+  for (i = 0; i < n_times; i++)
+  {
+      N = num_min + i * incr;
+      if (average_sorting_time(method, n_perms, N, &times[i]) == ERR)
+      {
+          free(times);
+          return ERR;
+      }
+  }
 
-    if (save_time_table(file, times, n_times) == ERR) {
-        free(times);
-        return ERR;
-    }
+  if (save_time_table(file, times, n_times) == ERR)
+  {
+      free(times);
+      return ERR;
+  }
 
-    free(times);
-    return OK;
+  free(times);
+  return OK;
 }
 
 /***************************************************/
 /* Function: save_time_table                       */
+/* Authors: Marco Manceñido, Rubén García         */
 /*                                                 */
-/* Guarda los resultados en un fichero de texto    */
-/* con el formato:                                 */
-/* N   time   avg_OB   min_OB   max_OB             */
+/* Function that saves the timing results in a    */
+/* text file with the following format:           */
+/* N   time   avg_OB   min_OB   max_OB            */
+/*                                                 */
+/* Input:                                          */
+/* char* file: name of the output file            */
+/* PTIME_AA times: array of TIME_AA structures    */
+/* int n_times: number of entries                  */
+/* Output: short: OK or ERR                        */
 /***************************************************/
 short save_time_table(char* file, PTIME_AA times, int n_times)
 {
-    int i;
-    FILE *fout;
+  int i;
+  FILE *fout;
 
-    if (!file || !times || n_times <= 0)
-        return ERR;
+  assert(file != NULL);
+  assert(times != NULL);
+  assert(n_times > 0);
 
-    fout = fopen(file, "w");
-    if (!fout) return ERR;
+  fout = fopen(file, "w");
+  if (fout == NULL)
+      return ERR;
 
-    for (i = 0; i < n_times; i++) {
-        fprintf(fout, "%d\t%.6f\t%.2f\t%d\t%d\n",
-                times[i].N,
-                times[i].time,
-                times[i].average_ob,
-                times[i].min_ob,
-                times[i].max_ob);
-    }
+  for (i = 0; i < n_times; i++)
+  {
+      fprintf(fout, "%d\t%.6f\t%.2f\t%d\t%d\n",
+              times[i].N,
+              times[i].time,
+              times[i].average_ob,
+              times[i].min_ob,
+              times[i].max_ob);
+  }
 
-    fclose(fout);
-    return OK;
+  fclose(fout);
+
+  return OK;
 }
-
-

@@ -19,6 +19,12 @@
   #define OK (!(ERR))
 #endif
 
+#ifndef SWAP_OP
+  #define SWAP_OP 3
+#endif
+
+#include <assert.h>
+
 /* type definitions */
 typedef int (* pfunc_sort)(int*, int, int);
 
@@ -31,5 +37,6 @@ int mergesort(int* tabla, int ip, int iu);
 int partition(int* tabla, int ip, int iu, int *pos);
 int median(int *tabla, int ip, int iu, int *pos);
 int quicksort(int* tabla, int ip, int iu);
+int median_stat(int *tabla, int ip, int iu, int *pos);
 
 #endif

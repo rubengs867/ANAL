@@ -19,7 +19,9 @@
   #define OK (!(ERR))
 #endif
 
+#include <assert.h>
 #include "sorting.h"
+#include "permutations.h"
 
 /* type definitions */
 typedef struct time_aa {
